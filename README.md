@@ -24,8 +24,10 @@
 | 文件 | 说明 |
 | --- | --- |
 | `巴别塔圣歌-字符输入台-v1.0.html` | 主程序（单文件） |
+| `index.html` | GitHub Pages 入口（与主程序内容相同） |
 | `塔歌字形表.xlsx` | 字形总表（含内嵌字体） |
 | `readme.txt` | 详细说明与致谢 |
+| `更新字体.bat` / `update_font.ps1` / `check_advance.py` | 字体更新与字宽核对工具（Windows） |
 | `字体/` | 字体源文件 |
 
 ## 关于代码
