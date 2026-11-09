@@ -53,9 +53,11 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;
   .tools{position:absolute!important;left:0!important;right:0!important;bottom:4px!important;transform:none!important;
          gap:6px;justify-content:center;align-items:center;padding:0;z-index:60;flex-wrap:nowrap}
   /* 手机端尺寸全部按屏宽比例算（基准 412px 宽的参考机），不写死像素 */
-  .tools .tb{width:auto!important;height:clamp(36px,10.7vw,56px)!important;padding:0 3.4vw!important;
-         font-size:clamp(15px,4.4vw,24px)!important;min-width:clamp(38px,11.2vw,60px)!important;
-         flex:0 0 auto!important;border-radius:clamp(10px,2.9vw,16px)!important}
+  #btnExport{display:none!important}
+  .tools{gap:5px!important}
+  .tools .tb{width:auto!important;height:clamp(38px,11.4vw,60px)!important;padding:0 3.1vw!important;
+         font-size:clamp(17px,5.2vw,28px)!important;min-width:clamp(40px,11.8vw,64px)!important;
+         flex:0 0 auto!important;border-radius:999px!important}
   /* 竖屏：书页撑满上半屏，面板固定在下方剩余空间 */
   #stage{width:100vw!important;height:calc(100vw * 0.7152)!important}
   body > #panel{position:fixed!important;left:0!important;right:0!important;top:calc(100vw * 0.7152 + 10.2vw)!important;
@@ -211,6 +213,7 @@ html.lang-fr #settingsClose, html.lang-fr .set-btn, html.lang-fr #toast {
       <button class="tb mob" id="btnMobPrev" title="上一页">‹</button>
       <button class="tb mob" id="btnMobEnter" title="换行">↵</button>
       <button class="tb mob" id="btnMobNext" title="下一页">›</button>
+      <button class="tb mob" id="btnMobCopy" title="复制字形图">复制图</button>
       <button class="tb" id="btnExport" data-i18n="copyChars" title="复制当前书页字符为 txt">复制字符</button>
     </div>
     <span id="ver" data-i18n="alpha">v1.0</span>
@@ -1046,10 +1049,15 @@ function selectionChars() {
   return out;
 }
 async function copyTextAsImage() {
+  let blob = null;
   try {
-    const chars = selectionChars();
-    if (!chars.length) return;
-    const blob = await charsToPngBlob([chars], 0);
+    let chars = selectionChars();
+    if (!chars.length) {
+      // 没选中：复制当前两页上的全部字符（手机端按钮用这个逻辑）
+      chars = [...pageChars(pageL), ...pageChars(pageR)].sort((a, b) => (a.y - b.y) || (a.x - b.x));
+    }
+    if (!chars.length) { toast('书页上没有字符'); return; }
+    blob = await charsToPngBlob([chars], 0);
     if (navigator.clipboard && window.ClipboardItem) {
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
       toast('已复制为字形图');
@@ -1057,6 +1065,19 @@ async function copyTextAsImage() {
     }
     throw new Error('no clipboard image');
   } catch (err) {
+    // 兜底：直接下载 PNG（file:// 或没有剪贴板权限时）
+    if (blob) {
+      try {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = '字形图.png';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+        toast('已导出字形图');
+        return;
+      } catch (e) {}
+    }
     toast('复制失败');
   }
 }
@@ -1244,6 +1265,7 @@ function mobBackspace() {
 }
 document.getElementById('btnMobEnter').onclick = () => mobInsertHtml('<div><br></div>');
 document.getElementById('btnMobBack').onclick = () => mobBackspace();
+document.getElementById('btnMobCopy').onclick = () => copyTextAsImage();
 document.getElementById('btnMobPrev').onclick = () => turnPage(-1);
 document.getElementById('btnMobNext').onclick = () => turnPage(1);
 
@@ -2144,10 +2166,15 @@ function selectionChars() {
   return out;
 }
 async function copyTextAsImage() {
+  let blob = null;
   try {
-    const chars = selectionChars();
-    if (!chars.length) return;
-    const blob = await charsToPngBlob([chars], 0);
+    let chars = selectionChars();
+    if (!chars.length) {
+      // 没选中：复制当前两页上的全部字符（手机端按钮用这个逻辑）
+      chars = [...pageChars(pageL), ...pageChars(pageR)].sort((a, b) => (a.y - b.y) || (a.x - b.x));
+    }
+    if (!chars.length) { toast('书页上没有字符'); return; }
+    blob = await charsToPngBlob([chars], 0);
     if (navigator.clipboard && window.ClipboardItem) {
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
       toast('已复制为字形图');
@@ -2155,6 +2182,19 @@ async function copyTextAsImage() {
     }
     throw new Error('no clipboard image');
   } catch (err) {
+    // 兜底：直接下载 PNG（file:// 或没有剪贴板权限时）
+    if (blob) {
+      try {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = '字形图.png';
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+        toast('已导出字形图');
+        return;
+      } catch (e) {}
+    }
     toast('复制失败');
   }
 }
@@ -2342,6 +2382,7 @@ function mobBackspace() {
 }
 document.getElementById('btnMobEnter').onclick = () => mobInsertHtml('<div><br></div>');
 document.getElementById('btnMobBack').onclick = () => mobBackspace();
+document.getElementById('btnMobCopy').onclick = () => copyTextAsImage();
 document.getElementById('btnMobPrev').onclick = () => turnPage(-1);
 document.getElementById('btnMobNext').onclick = () => turnPage(1);
 
