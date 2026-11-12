@@ -1105,10 +1105,15 @@ function selectionChars() {
   });
   return out;
 }
+function fileStamp() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate()) + '_' + p(d.getHours()) + p(d.getMinutes()) + p(d.getSeconds());
+}
 function downloadGlyphBlob(blob) {
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = '字形图.png';
+  a.download = '字形图_' + fileStamp() + '.png';
   document.body.appendChild(a);
   a.click();
   setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
@@ -1137,7 +1142,7 @@ async function copyTextAsImage() {
       try {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = '字形图.png';
+        a.download = '字形图_' + fileStamp() + '.png';
         document.body.appendChild(a);
         a.click();
         setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
@@ -1221,8 +1226,19 @@ function pageChars(el) {
 }
 
 /* 把字符位置列表画成透明底 PNG，按内容裁剪；页与页并排 */
+async function ensureGlyphFont(fs) {
+  // 显式确保 PUA 字体已加载，避免 canvas 用回退字体把所有字形画成同一个方块
+  const spec = fs + 'px BabelGlyph';
+  try {
+    if (!document.fonts.check(spec)) await document.fonts.load(spec, '');
+    if (!document.fonts.check(spec)) await document.fonts.load(spec, '');
+    return document.fonts.check(spec);
+  } catch (e) { return false; }
+}
+
 async function charsToPngBlob(pagesChars, gap) {
   await document.fonts.ready;
+  if (!(await ensureGlyphFont(fs))) { toast('字形字体未就绪，正在重试…'); await new Promise(r => setTimeout(r, 300)); await ensureGlyphFont(fs); }
   const fs = parseFloat(getComputedStyle(pageL).fontSize) || 42;
   const pageW = pageL.offsetWidth || 396;
   const g = gap == null ? 12 : gap;
@@ -1343,7 +1359,7 @@ document.getElementById('btnExport').onclick = () => {
     const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = '巴别塔字符.txt';
+    a.download = '巴别塔字符_' + fileStamp() + '.txt';
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
@@ -1368,7 +1384,7 @@ document.getElementById('btnCopy').onclick = async () => {
     // 剪贴板写图片不可用（比如 file:// 限制）：改为保存 PNG
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = '巴别塔圣歌-抄录.png';
+    a.href = url; a.download = '巴别塔圣歌-抄录_' + fileStamp() + '.png';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
     toast('已导出图片');
@@ -2282,7 +2298,7 @@ async function copyTextAsImage() {
       try {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(blob);
-        a.download = '字形图.png';
+        a.download = '字形图_' + fileStamp() + '.png';
         document.body.appendChild(a);
         a.click();
         setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
@@ -2368,6 +2384,7 @@ function pageChars(el) {
 /* 把字符位置列表画成透明底 PNG，按内容裁剪；页与页并排 */
 async function charsToPngBlob(pagesChars, gap) {
   await document.fonts.ready;
+  if (!(await ensureGlyphFont(fs))) { toast('字形字体未就绪，正在重试…'); await new Promise(r => setTimeout(r, 300)); await ensureGlyphFont(fs); }
   const fs = parseFloat(getComputedStyle(pageL).fontSize) || 42;
   const pageW = pageL.offsetWidth || 396;
   const g = gap == null ? 12 : gap;
@@ -2488,7 +2505,7 @@ document.getElementById('btnExport').onclick = () => {
     const blob = new Blob([txt], { type: 'text/plain;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = '巴别塔字符.txt';
+    a.download = '巴别塔字符_' + fileStamp() + '.txt';
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800);
@@ -2513,7 +2530,7 @@ document.getElementById('btnCopy').onclick = async () => {
     // 剪贴板写图片不可用（比如 file:// 限制）：改为保存 PNG
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = '巴别塔圣歌-抄录.png';
+    a.href = url; a.download = '巴别塔圣歌-抄录_' + fileStamp() + '.png';
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
     toast('已导出图片');
