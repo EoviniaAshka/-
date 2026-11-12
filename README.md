@@ -14,9 +14,13 @@ Supports the Devotees, Warriors, Bards, Alchemists and Anchorites scripts, inclu
 
 ## 使用 / Usage
 
-双击 `巴别塔圣歌-字符输入台-v1.0.html` 即开即用。
+- **在线使用**：直接打开 `https://eoviniaashka.github.io/-/`（GitHub Pages）。
+- **本地使用**：把 `巴别塔圣歌-字符输入台-v1.0.html` 下载到电脑，双击用浏览器打开（推荐 Chrome / Edge / Safari / Firefox）。不需要安装任何软件，也不需要联网。
 
-Double-click `巴别塔圣歌-字符输入台-v1.0.html` to run — no installation needed.
+
+- **Online**: open `https://eoviniaashka.github.io/-/` (GitHub Pages).
+- **Local**: download `巴别塔圣歌-字符输入台-v1.0.html` and double-click it to open in a browser (Chrome / Edge / Safari / Firefox recommended). Nothing to install, no internet connection required.
+
 
 ## 功能 / Features
 
@@ -65,8 +69,6 @@ Double-click `巴别塔圣歌-字符输入台-v1.0.html` to run — no installat
   Ordering reads the last column 「词性 / part of speech」 of `塔歌字形表.xlsx`, grouping as **person → verb → adjective → noun → tool → place → other**.
 - 词性列**留空**的行保持原相对顺序，排在最后；**整列全空时面板完全保持原顺序不动**。
   Rows with an **empty** part-of-speech keep their relative order and go last; **if the whole column is empty the panel keeps its original order untouched**.
-- 想改顺序：给行填「词性」→ 双击 `更新字体.bat` → 刷新页面。
-  To change ordering: fill in the part of speech → double-click `更新字体.bat` → refresh the page.
 - 设置里的「码位序」模式不看词性表，直接按码位排。
   The 「码位序 / By code point」 mode ignores the table and sorts strictly by code point.
 
@@ -85,20 +87,3 @@ Background art, sound effects and other art/audio assets remain the property of 
 详细说明与扩充字形的贡献者鸣谢见 `readme.txt`。
 
 Detailed notes and the list of contributors for extended glyphs are in `readme.txt`.
-
-## 如何加入新字形 / Adding new glyphs
-
-1. **画字形 / Draw it**：在 FontCreator 里选一个没用过的 PUA 码位（建议接在对应族扩充段的末尾），画好后导出 OTF，覆盖维护工具目录 `巴别塔圣歌-维护工具/字体/` 里的字体文件。
-   In FontCreator, pick an unused PUA code point (ideally right after that family's extension block), draw the glyph, export an OTF and overwrite the font in `巴别塔圣歌-维护工具/字体/`.
-2. **加表行 / Add a table row**：在 `塔歌字形表.xlsx` 末尾加一行 —— 语族（信徒 / 战士 / 诗人 / 炼金 / 隐者）、码位（`U+Exxxx`）、字形字符、中文释义、备注。「#」列随便填，脚本会自动重排成 1..N。
-   Append a row to `塔歌字形表.xlsx`: family, code point (`U+Exxxx`), glyph character, Chinese meaning, note. The 「#」 column can be anything — the script renumbers it to 1..N.
-   - 字形列（D 列）可以把那个字符直接填进去，用 Excel 公式 `=UNICHAR(HEX2DEC("E198"))` 或 Word 里输入 `E198` 后按 `Alt+X` 转成字符再粘贴。
-     For the glyph column (D) you may paste the character itself, produced with Excel `=UNICHAR(HEX2DEC("E198"))` or by typing `E198` in Word and pressing `Alt+X`.
-3. **跑更新 / Run the update**：双击维护工具目录里的 `更新字体.bat`（它和 v1.0 包要放在同一个文件夹）。它会依次：嵌入字体 → 按表同步词义 → 重排编号 → **码位/字形核验**（有码位但字体里没字形的行会被点名；字形列填了字符的会自动改正码位）→ 字宽核对 → 重新打包。
-   Double-click `更新字体.bat` (it must sit next to the v1.0 folder). It will: embed the font → sync meanings from the table → renumber → **verify code points vs glyphs** (rows whose glyph is missing are reported; rows whose D column has a character get their code point auto-corrected) → check advance widths → repack.
-4. **刷新页面 / Refresh**：新字形出现在对应语族面板末尾；切到「码位序」会按码位自动排到正确位置。
-   The new glyph appears at the end of that family's panel; in 「码位序」 mode it lands at its proper code-point position.
-
-说明：表里释义写「(未知)」「(未知）」「（未知）」的行只作记录，不会同步进面板。
-
-Note: rows whose meaning contains 「未知 / unknown」 are kept for records only and are not synced into the panel.
