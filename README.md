@@ -36,10 +36,12 @@ Supports the Devotees, Warriors, Bards, Alchemists and Anchorites scripts, inclu
   Settings lets you adjust font size, colour and UI language (中文 / Français / English).
 - 设置页可切换面板排序：**词性序**（人→动词→形容词→名词→工具类→场所→其他）或 **码位序**。
   Settings toggles panel ordering: **by part of speech** (person → verb → adjective → noun → tool → place → other) or **by code point**.
+- 支持从别处**粘贴**：汉字、英文字母数字、以及本页的字形字符都能粘进书页（其它杂质自动丢弃）。
+  **Paste** works: Chinese characters, Latin letters/digits and this page's glyphs can be pasted into the book page (other junk is dropped automatically).
 - 炼金术士四位数字形态、连接符与小数点。
   Alchemist four-form numerals, connectors and decimal point.
-- **电脑端与手机端都自适应**：电脑端 UI 按屏幕宽度等比缩放（1280～4K）；手机竖屏使用专门的布局（书页占上半屏、底部胶囊形操作键、可滚动字形面板），手机底部还带「复制图」按钮。
-  **Responsive on desktop and mobile**: desktop UI scales with screen width (1280–4K); mobile portrait uses a dedicated layout (book occupies the top half, pill-shaped bottom controls, scrollable glyph panel) plus a 「复制图 / Copy image」 button.
+- **电脑端与手机端都自适应**：电脑端 UI 按屏幕宽度等比缩放（1280～4K）；手机竖屏使用专门的布局（书页占上半屏、底部胶囊形操作键、可滚动字形面板），手机底部还带「保存图」按钮（直接保存 PNG）；手机右上角齿轮可打开全屏设置页。
+  **Responsive on desktop and mobile**: desktop UI scales with screen width (1280–4K); mobile portrait uses a dedicated layout (book occupies the top half, pill-shaped bottom controls, scrollable glyph panel) plus a 「保存图 / Save image」 button (saves a PNG directly); the gear at the top-right opens the full-screen Settings page on mobile.
 
 ## 手机端操作 / Mobile controls
 
@@ -48,7 +50,8 @@ Supports the Devotees, Warriors, Bards, Alchemists and Anchorites scripts, inclu
 | 轻点字形 / Tap a glyph | 插入字符 / Insert the glyph |
 | 长按字形（约半秒）/ Long-press (~0.5 s) | 显示释义气泡，不会插入 / Show the meaning bubble, no insertion |
 | 底部 ⌫ / ‹ / ↵ / › | 退格 / 上一页 / 换行 / 下一页 — Backspace / previous page / new line / next page |
-| 底部「复制图」/ 「Copy image」 | 把当前两页的字符导出成一张字形图 / Export both pages as one glyph image（复制到剪贴板；不支持时自动下载 PNG / copied to clipboard, or downloaded as PNG when unsupported） |
+| 底部「保存图」/ 「Save image」 | 把当前两页的字符**直接保存成 PNG 图片**（下载到手机）/ **Save both pages as a PNG image** (downloads to the phone) |
+| 右上角齿轮 / Gear (top-right) | 打开全屏设置页（字号、颜色、语言、排序）/ Open the full-screen Settings page (size, colour, language, order) |
 
 ## 文件说明 / Files
 
@@ -59,9 +62,9 @@ Supports the Devotees, Warriors, Bards, Alchemists and Anchorites scripts, inclu
 | `塔歌字形表.xlsx` | 字形总表（词义的唯一来源）/ Master glyph table (single source of truth for meanings) |
 | `readme.txt` | 详细说明与致谢 / Detailed notes and credits |
 
-> 字体更新相关的维护工具（`更新字体.bat`、`update_font.ps1`、`sync_meanings.py`、`renumber_xlsx.py`、`verify_glyphs.py`、`check_advance.py`、`字体/` 源字体）**不在发布包里**，放在作者桌面上的 `巴别塔圣歌-维护工具/` 文件夹里；需要改字体或改词义时才用，普通使用不需要。
+> 字体更新相关的维护工具（`更新字体.bat`、`update_font.ps1`、`sync_meanings.py`、`verify_glyphs.py`、`check_advance.py`、`字体/` 源字体）**不在发布包里**，放在作者桌面上的 `巴别塔圣歌-维护工具/` 文件夹里；需要改字体或改词义时才用，普通使用不需要。
 >
-> Maintenance tools (`更新字体.bat`, `update_font.ps1`, `sync_meanings.py`, `renumber_xlsx.py`, `verify_glyphs.py`, `check_advance.py` and the source font folder `字体/`) are **not included** in the release package — they live in the author's `巴别塔圣歌-维护工具/` folder and are only needed when editing the font or meanings.
+> Maintenance tools (`更新字体.bat`, `update_font.ps1`, `sync_meanings.py`, `verify_glyphs.py`, `check_advance.py` and the source font folder `字体/`) are **not included** in the release package — they live in the author's `巴别塔圣歌-维护工具/` folder and are only needed when editing the font or meanings.
 
 ## 面板顺序（词性序）/ Panel order (by part of speech)
 

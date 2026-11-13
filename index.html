@@ -72,6 +72,24 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;
   body > .tools{position:fixed!important;left:0!important;right:0!important;bottom:clamp(2px,0.9vw,6px)!important;
          top:auto!important;transform:none!important;z-index:60!important;background:transparent}
 }
+@media (max-width: 900px) and (orientation: portrait){
+  /* 移动端：齿轮固定在视口右上角，点开设置 */
+  #gearBtn{position:fixed!important;right:3.2vw!important;left:auto!important;top:2.4vw!important;width:11.5vw!important;height:11.5vw!important;z-index:99!important}
+  #gearBtn svg{width:7.4vw!important;height:7.4vw!important}
+  #settingsMask{position:fixed!important;inset:auto!important;left:0!important;top:0!important;width:100vw!important;height:100vh!important;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+  #settingsPanel{width:100%!important;height:100%!important;padding:7vw 5.5vw!important;box-sizing:border-box!important}
+  #settingsPanel h2{font-size:5.6vw!important;letter-spacing:.24em!important;margin:0 0 5vw!important}
+  #settingsPanel .set-row{margin-bottom:4.6vw!important;gap:3vw!important}
+  #settingsPanel .set-help p{font-size:3.8vw!important;line-height:1.7!important}
+  #langRow{gap:2vw!important;flex-wrap:wrap!important}
+  #langRow .set-btn{font-size:3.5vw!important;padding:.85em 1.15em!important}
+  #sortRow{gap:2vw!important}
+  #setPreview{font-size:6.6vw!important;min-height:24vw!important}
+  #settingsPanel{padding:7vw 5.5vw 16vw!important}
+  #settingsPanel h2{display:none!important}
+  #settingsClose{position:fixed!important;right:3vw!important;top:2.2vw!important;margin:0!important;z-index:101!important;font-size:3.9vw!important;padding:.9em 1.6em!important;border-radius:999px!important;display:block!important}
+  #setPreview{font-size:6vw!important;min-height:20vw!important}
+}
 #ver{position:fixed;left:calc(22px*var(--k,1));top:calc(14px*var(--k,1));color:rgba(240,228,200,.42);font-size:calc(13px*var(--k,1));letter-spacing:.14em;user-select:none;z-index:6;pointer-events:none}
 .tools .tb{width:auto;min-width:calc(52px*var(--k,1));height:calc(46px*var(--k,1));border-radius:999px;padding:0 calc(26px*var(--k,1));
   white-space:nowrap;font-size:calc(17px*var(--k,1));letter-spacing:.12em;color:#fff;
@@ -228,7 +246,7 @@ html.lang-fr #settingsClose, html.lang-fr .set-btn, html.lang-fr #toast {
       <button class="tb mob" id="btnMobPrev" title="上一页">‹</button>
       <button class="tb mob" id="btnMobEnter" title="换行">↵</button>
       <button class="tb mob" id="btnMobNext" title="下一页">›</button>
-      <button class="tb mob" id="btnMobCopy" title="复制字形图">复制图</button>
+      <button class="tb mob" id="btnMobCopy" title="保存字形图">保存图</button>
       <button class="tb" id="btnExport" data-i18n="copyChars" title="复制当前书页字符为 txt">复制字符</button>
     </div>
     <span id="ver" data-i18n="alpha">v1.0</span>
@@ -594,6 +612,13 @@ function refreshSettingsPreview() {
   const line2 = [pick('Moi'), pick('Aimer'), pick('Toi')].filter(Boolean).join('');
   pv.textContent = line1 + String.fromCharCode(10) + line2;
 }
+/* 移动端竖屏：把齿轮与设置页移到 body 下，避免被 #inner 的缩放坐标系挤到屏幕外 */
+try {
+  if (window.matchMedia('(max-width: 900px) and (orientation: portrait)').matches) {
+    document.body.appendChild(gearBtn);
+    document.body.appendChild(settingsMask);
+  }
+} catch (e) {}
 gearBtn.addEventListener('click', () => { refreshSettingsPreview(); settingsMask.classList.add('show'); });
 document.getElementById('settingsClose').addEventListener('click', () => settingsMask.classList.remove('show'));
 settingsMask.addEventListener('click', e => { if (e.target === settingsMask) settingsMask.classList.remove('show'); });
@@ -1125,8 +1150,6 @@ async function copyTextAsImage() {
     }
     if (!chars.length) { toast('书页上没有字符'); return; }
     blob = await charsToPngBlob([chars], 0);
-    // 移动端浏览器大多不支持把图片写进剪贴板 → 直接下载
-    if (IS_TOUCH) { downloadGlyphBlob(blob); toast('已保存字形图'); return; }
     if (navigator.clipboard && window.ClipboardItem) {
       await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
       toast('已复制为字形图');
@@ -1176,7 +1199,27 @@ async function copyTextAsImage() {
       e.preventDefault();
     }
   });
-  el.addEventListener('paste', e => e.preventDefault());
+  // 粘贴：只收 BabelGlyph 已有的 PUA 字形 + 空格 + ASCII，其它字符丢掉（直接插 DOM，不触发 beforeinput）
+  el.addEventListener('paste', e => {
+    e.preventDefault();
+    const cd = e.clipboardData || window.clipboardData;
+    if (!cd) return;
+    const txt = cd.getData('text/plain') || '';
+    const clean = [...txt].filter(ch => {
+      const c = ch.codePointAt(0);
+      return c === 0x09 || c === 0x0A || c === 0x0D || c >= 0x20;   // 只丢控制字符：汉字/全角/emoji/PUA 都保留
+    }).join('');
+    if (!clean) { toast('剪贴板里没有可插入的字符'); return; }
+    const sel = window.getSelection();
+    if (!sel || !sel.rangeCount) return;
+    const r = sel.getRangeAt(0);
+    r.deleteContents();
+    const tn = document.createTextNode(clean);
+    r.insertNode(tn);
+    r.setStartAfter(tn); r.collapse(true);
+    sel.removeAllRanges(); sel.addRange(r);
+    saveBook(); saveCaret();
+  });
 });
 function nodesToCodes(n, out) {
   n.childNodes.forEach(c => {
@@ -1346,7 +1389,20 @@ function mobBackspace() {
 }
 document.getElementById('btnMobEnter').onclick = () => mobInsertHtml('<div><br></div>');
 document.getElementById('btnMobBack').onclick = () => mobBackspace();
-document.getElementById('btnMobCopy').onclick = () => copyTextAsImage();
+document.getElementById('btnMobCopy').onclick = async () => {
+  try {
+    let chars = selectionChars();
+    if (!chars.length) {
+      chars = [...pageChars(pageL), ...pageChars(pageR)].sort((a, b) => (a.y - b.y) || (a.x - b.x));
+    }
+    if (!chars.length) { toast('书页上没有字符'); return; }
+    const blob = await charsToPngBlob([chars], 0);
+    downloadGlyphBlob(blob);
+    toast('已保存字形图');
+  } catch (e) {
+    toast('图片生成失败：' + (e && e.message ? e.message : '未知错误'));
+  }
+};
 document.getElementById('btnMobPrev').onclick = () => turnPage(-1);
 document.getElementById('btnMobNext').onclick = () => turnPage(1);
 
