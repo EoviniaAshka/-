@@ -75,7 +75,9 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;
 @media (max-width: 900px) and (orientation: portrait){
   /* 移动端：齿轮固定在视口右上角，点开设置 */
   #gearBtn{position:fixed!important;right:3.2vw!important;left:auto!important;top:2.4vw!important;width:11.5vw!important;height:11.5vw!important;z-index:99!important}
+  #cnBtn{position:fixed!important;right:3.2vw!important;left:auto!important;top:calc(2.4vw + 15.5vw)!important;width:11.5vw!important;height:11.5vw!important;z-index:99!important;font-size:4.6vw!important;border-width:2px!important}
   #gearBtn svg{width:7.4vw!important;height:7.4vw!important}
+  .btip{font-size:11px!important;padding:2px 7px!important}
   #settingsMask{position:fixed!important;inset:auto!important;left:0!important;top:0!important;width:100vw!important;height:100vh!important;background:rgba(0,0,0,.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
   #settingsPanel{width:100%!important;height:100%!important;padding:7vw 5.5vw!important;box-sizing:border-box!important}
   #settingsPanel h2{font-size:5.6vw!important;letter-spacing:.24em!important;margin:0 0 5vw!important}
@@ -101,6 +103,20 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;
 #tabHots{position:absolute;inset:0;pointer-events:none;z-index:6}
 #tabHots .th{position:absolute;pointer-events:auto;background:transparent;border:0;padding:0;cursor:pointer}
 #nextHot:hover{background:rgba(255,235,180,.12)}
+/* 显示全部字义按钮 */
+#cnBtn{position:absolute;right:calc(160px*var(--k,1));top:calc(18px*var(--k,1));z-index:9;width:calc(60px*var(--k,1));height:calc(60px*var(--k,1));border-radius:50%;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;background:transparent;
+  border:calc(2px*var(--k,1)) solid rgba(255,255,255,.32);color:#fff;
+  font-family:"SimHei","黑体","Microsoft YaHei",sans-serif;font-size:calc(24px*var(--k,1));line-height:1;
+  transition:border-color .15s,background .15s;user-select:none;-webkit-user-select:none}
+#cnBtn:hover{border-color:#fff;background:rgba(255,255,255,.08)}
+#cnBtn.on{border-color:#fff;background:rgba(255,255,255,.2)}
+.btip{display:none;position:absolute;transform:translateX(-50%);
+  font-family:"SimHei","黑体","Microsoft YaHei",sans-serif;font-size:calc(15px*var(--k,1));line-height:1.2;
+  color:#fff;background:#141414;border-radius:999px;padding:calc(4px*var(--k,1)) calc(11px*var(--k,1));
+  white-space:nowrap;pointer-events:none;z-index:9;box-shadow:0 4px 14px rgba(0,0,0,.4)}
+#panelBody.show-cn .btip{display:block}
+
 /* 右上角齿轮设置按钮：平时无边框，悬停白边变宽 */
 #gearBtn{position:absolute;right:calc(88px*var(--k,1));top:calc(18px*var(--k,1));z-index:9;width:calc(60px*var(--k,1));height:calc(60px*var(--k,1));border-radius:50%;
   display:flex;align-items:center;justify-content:center;cursor:pointer;
@@ -164,6 +180,8 @@ html.lang-fr #settingsClose, html.lang-fr .set-btn, html.lang-fr #toast {
   padding:calc(9px*var(--k,1)) calc(20px*var(--k,1));border-radius:999px;white-space:nowrap;opacity:0;pointer-events:none;
   transition:opacity .1s;z-index:60;box-shadow:0 6px 18px rgba(0,0,0,.45)}
 #glyphTip.show{opacity:1}
+#glyphTip.below{transform:translate(-50%,0)}
+#glyphTip.below::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:#141414}
 #glyphTip::after{content:'';position:absolute;left:50%;top:100%;transform:translateX(-50%);
   border:7px solid transparent;border-top-color:#141414}
 #toast{position:absolute;left:50%;top:118px;transform:translateX(-50%) translateY(-6px);
@@ -193,6 +211,7 @@ html.lang-fr #settingsClose, html.lang-fr .set-btn, html.lang-fr #toast {
     </div>
     <button id="nextHot" title="下一个语族（数字键 1–5）"></button>
     <div id="tabHots"></div>
+    <button id="cnBtn" title="显示全部字义">释</button>
     <button id="gearBtn" title="设置"><svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg></button>
     <div id="settingsMask">
       <div id="settingsPanel">
@@ -496,6 +515,29 @@ window.addEventListener('DOMContentLoaded', () => {
 const panelBody = document.getElementById('panelBody'), inner = document.getElementById('inner');
 const pTitle = document.getElementById('pTitle'), pSub = document.getElementById('pSub');
 const toastEl = document.getElementById('toast');
+/* 显示全部字义开关 */
+const cnBtnEl = document.getElementById('cnBtn');
+if (cnBtnEl) {
+  const CNK = 'babel-book-v4-showcn';
+  const reflowTips = () => {
+    const iw = inner.clientWidth || 0;
+    inner.querySelectorAll('.btip').forEach(tp => {
+      const cx = parseFloat(tp.dataset.cx || '0'), tw = tp.offsetWidth || 40;
+      let bx = cx - tw / 2;
+      bx = Math.min(Math.max(bx, 2), Math.max(2, iw - tw - 2));
+      tp.style.left = bx + 'px';
+    });
+  };
+  const setCn = (on) => {
+    panelBody.classList.toggle('show-cn', on);
+    cnBtnEl.classList.toggle('on', on);
+    panelBody.style.paddingTop = on ? 'calc(28px * var(--k,1))' : '';
+    try { localStorage.setItem(CNK, on ? '1' : '0'); } catch (e) {}
+    if (typeof buildPanel === 'function') { buildPanel(); requestAnimationFrame(reflowTips); }
+  };
+  cnBtnEl.addEventListener('click', () => setCn(!panelBody.classList.contains('show-cn')));
+  try { if (localStorage.getItem(CNK) === '1') setCn(true); } catch (e) {}
+}
 const STORE_KEY = 'babel-book-v4';
 let cur = 0;
 const store = (() => { try { return JSON.parse(localStorage.getItem(STORE_KEY) || '{}'); } catch (e) { return {}; } })();
@@ -617,6 +659,7 @@ try {
   if (window.matchMedia('(max-width: 900px) and (orientation: portrait)').matches) {
     document.body.appendChild(gearBtn);
     document.body.appendChild(settingsMask);
+    const _cnb0 = document.getElementById('cnBtn'); if (_cnb0) document.body.appendChild(_cnb0);
   }
 } catch (e) {}
 gearBtn.addEventListener('click', () => { refreshSettingsPreview(); settingsMask.classList.add('show'); });
@@ -673,9 +716,17 @@ function showGlyphTip(b, text) {
   if (!glyphTipEl || !text) return;
   const br = b.getBoundingClientRect();
   glyphTipEl.textContent = text;
-  glyphTipEl.style.left = (br.left + br.width / 2) + 'px';
-  glyphTipEl.style.top = (br.top - 12) + 'px';
   glyphTipEl.classList.add('show');
+  const tw = glyphTipEl.offsetWidth, th = glyphTipEl.offsetHeight;
+  let x = br.left + br.width / 2;
+  let y = br.top - 8;
+  const below = (y - th) < 6;
+  glyphTipEl.classList.toggle('below', below);
+  if (below) y = br.bottom + 8;
+  x = Math.min(Math.max(x, tw / 2 + 6), window.innerWidth - tw / 2 - 6);
+  y = Math.min(Math.max(y, 6), window.innerHeight - 6);
+  glyphTipEl.style.left = x + 'px';
+  glyphTipEl.style.top = y + 'px';
 }
 function hideGlyphTip() {
   if (glyphTipEl) glyphTipEl.classList.remove('show');
@@ -855,6 +906,23 @@ function buildPanel() {
           _lp = false;
         }
       }, { passive: false });
+    }
+    if (it.cn) {
+      const tp = document.createElement('div');
+      tp.className = 'btip';
+      tp.textContent = it.cn;
+      const by = parseFloat(b.style.top);
+      tp.style.top = (by - 3) + 'px';
+      tp.style.left = '0px';
+      tp.style.transform = 'translate(0,-100%)';
+      inner.appendChild(tp);
+      const cx = parseFloat(b.style.left) + badgeW / 2;
+      tp.dataset.cx = String(cx);
+      const tw = tp.offsetWidth || 40;
+      const iw = inner.clientWidth || (perRow * colW);
+      let bx = cx - tw / 2;
+      bx = Math.min(Math.max(bx, 2), Math.max(2, iw - tw - 2));
+      tp.style.left = bx + 'px';
     }
     inner.appendChild(b);
   });
